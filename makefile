@@ -5,13 +5,13 @@
 .PHONY = all install clean rmproper
 .RECIPEPREFIX = >
 
+CC:=g++
 EXE:=ss3d
 SOURCE:=$(wildcard *.cpp) $(wildcard Algorithm/*.cpp) $(wildcard Module/*.cpp)
 OBJ:=$(SOURCE:%.cpp=%.o)
 FLAG:=-O2
 LDLIBS:=-lm
 LDFLAGS:=
-CC:=g++
 STD:=-std=c++14
 
 all: $(EXE)
