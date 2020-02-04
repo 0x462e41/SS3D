@@ -6,24 +6,30 @@ evaluating the Sequence Similarity in 3D space between two proteins. Such compar
 are useful for a plethora of purposes such as determination of conserved positions,
 and explaining different functionalities of proteins that evolved from a common ancestor.
 
-For more information about this tool, check the paper at <upcoming link>.
+For more information about this tool, check the paper at ~~upcoming link~~.
 
 ## Installation
 
-OS X & Linux:
+### OS X & Linux:
 
-The only dependence is the sdt14 library itself, and the gcc compiler. You can also use
-others compilers, just change the 'CC' variable present at the top of the ``makefile``.
+The only dependences are the sdt14 library itself, and the gcc compiler.
+You can install it using the following command:
 
+```sh
+sudo apt install build-essential
+```
+
+You can also use other compilers, just change the 'CC' variable present at the top
+of the ``makefile``.
 After downloading/cloning the repository, just enter the folder and type the command:
 
 ```sh
 make
 ```
 
-It will create an executable called 'ss3d' inside this folder.
+It will create an executable called 'ss3d' inside the folder.
 
-Windows:
+### Windows:
 
 It should be easier to import the repository as a new project and compile it using Code::Blocks,
 Visual Studio or any c++14 IDE/Compiler.
