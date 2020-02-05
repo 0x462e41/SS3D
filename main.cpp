@@ -116,7 +116,8 @@ int main(int argc, char **argv){
             kill_program();
         if(!HandleInput::checkIn(HandleInput::getParameter(args, "-b"), ".pdb"))
             kill_program();
-        if(!HandleInput::checkOut(HandleInput::getParameter(args, "-o"), ".xvg"))
+        string outputPath=HandleInput::getParameter(args, "-o");
+        if(!HandleInput::checkOut(outputPath, ".xvg"))
             kill_program();
 
         //First protein
@@ -248,7 +249,7 @@ int main(int argc, char **argv){
             param_ss3d_comp.mat = MAT;
         }
 
-        param_ss3d_comp.path = HandleInput::getParameter(args, "-o");
+        param_ss3d_comp.path = outputPath;
 
         bool result = ss3d::compare(identity_A, identity_B, param_ss3d_comp);
         if(!result)

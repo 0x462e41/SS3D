@@ -181,7 +181,7 @@ bool HandleInput::checkIn(string path, string ext){
 }
 
 //Checks if output file is accessible
-bool HandleInput::checkOut(string path, string ext){
+bool HandleInput::checkOut(string &path, string ext){
 
     if(path.length()<=ext.length() || path.find(ext)==0 || path.find(ext)==string::npos){
 

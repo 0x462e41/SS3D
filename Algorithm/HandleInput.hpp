@@ -41,6 +41,6 @@ class HandleInput{
 
     static bool checkIn(string path, string ext);
 
-    static bool checkOut(string path, string ext);
+    static bool checkOut(string &path, string ext);
 
 };
