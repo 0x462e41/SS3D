@@ -34,7 +34,7 @@ It will create an executable called 'ss3d' inside the folder.
 It should be easier to import the repository as a new project and compile it using Code::Blocks,
 Visual Studio or any c++14 IDE/Compiler.
 
-## Usage example
+## Usage
 
 To get a quick overview of the required and optional parameters, type:
 
@@ -54,7 +54,7 @@ or
 >
 >   OPTIONS:
 >
->   Obrigatory options to specify input & output files:
+>   Obligatory options to specify input & output files:
 >
 >    -a
 >
@@ -68,31 +68,31 @@ or
 >
 >           Output text file in .xvg format.
 >
->   Others options:
+>   Other options:
 >
 >    -dist
 >
 >           The maximum distance to be considered a contact between alpha carbons, in Ångströms.
->           (default dinstance is 10 Ångströms)
+>           (default distance is 10 Ångströms)
 >
 >    -skip
 >
->           The minimum distance between residues in the primary structure to be considered,
->           in absolute number (default skip is 3).
+>           The minimum distance between the residues in the primary structure to be excluded from
+>           being considered a contact, in absolute number (the default skip is 3).
 >
 >    -rad
 >
->           The maximum radius to search for interaction between alpha carbons, in Ångströms.
+>           The maximum radius to look for interaction between alpha carbons and a contact, in Ångströms.
 >           (default radius is 10 Ångströms)
 >
 >    -min
 >
->           Minimum number of common residues around the contact to be considered.
->           (default is 1).
+>           Minimum (absolute) number of common residues between the two proteins around a particular contact
+>           for it to be accepted. (default is 1 residue[s]).
 >
 >    -mat
 >
->           Select the substitution matrix to be used to evaluate the conscore. The default matrix is blosum62.
+>           Select the substitution matrix to be used to evaluate the score. The default matrix is blosum62.
 >           The options are:
 >           pam250 - The PAM250 matrix.
 >           blosum62 - The BLOSUM62 matrix.
