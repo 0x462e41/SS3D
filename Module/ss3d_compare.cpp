@@ -34,33 +34,33 @@ bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
 
     //Variable
     ofstream fout(param.path);
-    float conscore;
+    float score;
     unsigned int cnt;
 
-    //Calculates the conscore using the chosen matrix, and saves it into the file
-    fout << "#IndexA IndexB Conscore\n";
+    //Calculates the score using the chosen matrix, and saves it into the file
+    fout << "#IndexA IndexB Score\n";
     for(unsigned int i=0; i<protA.length(); i++){ //Loop through all 'A' interactions
         for(unsigned int j=0; j<protB.length(); j++){ //Loop through all 'B' interactions
 
             //Pairing ...
             if(protA[i].getIndexD()==protB[j].getIndexD() && protA[i].getIndexA()==protB[j].getIndexA()){
 
-                conscore=0; //Conscore value;
+                score=0; //Conscore value;
                 cnt=0; //Number of common residues around the contact
 
-                //Lining up the interactions, and calculating the conscore
+                //Lining up the interactions, and calculating the score
                 for(unsigned int k=0; k<protA[i].molecules.length(); k++) //Loop through all residues around A
                     for(unsigned int l=0; l<protB[j].molecules.length(); l++) //Loop through all residues around B
                         if(protA[i].molecules[k].getIndex()==protB[j].molecules[l].getIndex()){
                             cnt++;
-                            conscore+=Matrix::align(param.mat, protA[i].molecules[k], protB[j].molecules[l]);
+                            score+=Matrix::align(param.mat, protA[i].molecules[k], protB[j].molecules[l]);
                         }
 
                 //Checking if the minimum number of common residues around this contact was attended
                 if(cnt>=param.min){
-                    fout << protA[i].getIndexD() << " " << protA[i].getIndexA() << " " << conscore << " " << "\n";
+                    fout << protA[i].getIndexD() << " " << protA[i].getIndexA() << " " << score << " " << "\n";
                     if(param.dup)
-                        fout << protA[i].getIndexA() << " " << protA[i].getIndexD() << " " << conscore << " " << "\n";
+                        fout << protA[i].getIndexA() << " " << protA[i].getIndexD() << " " << score << " " << "\n";
                 }
 
                 break;
