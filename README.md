@@ -68,18 +68,20 @@ or
 >
 >    -dist
 >
->           The maximum distance to be considered a contact between alpha carbons, in Ångströms.
+>           The maximum distance to be considered a contact between two alpha carbons, in Ångströms.
 >           (default distance is 10 Ångströms)
->
->    -skip
->
->           The minimum distance between the residues in the primary structure to be excluded from
->           being considered a contact, in absolute number (the default skip is 3).
 >
 >    -rad
 >
->           The maximum radius to look for interaction between alpha carbons and a contact, in Ångströms.
+>           The maximum search radius for identifying alpha carbons around a contact, in Ångströms.
 >           (default radius is 10 Ångströms)
+>
+>    -skip
+>
+>           Exclude this number of residues within the search radius upstream and downstream in primary
+>           sequence of the alpha carbon involved in the contact. Used to diminish the contribution of
+>           sequentially proximal residues in the scoring. (default skip is 3, which will exclude
+>           6 residues total: the three previous and three subsequent to the one involved in the contact).
 >
 >    -min
 >

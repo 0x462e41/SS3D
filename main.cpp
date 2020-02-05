@@ -81,7 +81,7 @@ int main(int argc, char **argv){
     if(args.size() >= 1)
         if(args[0]=="help" || args[0]=="-h"){
         cout << "SYNOPSIS" << endl << endl;
-        cout << "ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg]] [-dist <number>] [-skip <number>] [-rad <number>]";
+        cout << "ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg]] [-dist <number>] [-rad <number>] [-skip <number>]";
         cout << " [-min <number>] [-mat <matrix type>] [-dup]" << endl;
 
         cout << endl << "OPTIONS:" << endl << endl;
@@ -90,12 +90,14 @@ int main(int argc, char **argv){
         cout << " -b\n\tStructural file in .pdb format of the second protein." << endl;
         cout << " -o\n\tOutput text file in .xvg format." << endl;
         cout << endl << "Other options:" << endl << endl;
-        cout << " -dist\n\tThe maximum distance to be considered a contact between alpha carbons, in Ångströms." << endl;
+        cout << " -dist\n\tThe maximum distance to be considered a contact between two alpha carbons, in Ångströms." << endl;
         cout << "\t(default distance is " << DISTANCE << " Ångströms)" << endl;
-        cout << " -skip\n\tThe minimum distance between the residues in the primary structure to be excluded from" << endl;
-        cout << "\tbeing considered a contact, in absolute number (default skip is " << SKIP << ")." << endl;
-        cout << " -rad\n\tThe maximum radius to look for interaction between alpha carbons and a contact, in Ångströms." << endl;
+        cout << " -rad\n\tThe maximum search radius for identifying alpha carbons around a contact, in Ångströms." << endl;
         cout << "\t(default radius is " << RADIUS << " Ångströms)" << endl;
+        cout << " -skip\n\tExclude this number of residues within the search radius upstream and downstream in primary " << endl;
+        cout << "\tsequence of the alpha carbon involved in the contact. Used to diminish the contribution of " << endl;
+        cout << "\tsequentially proximal residues in the scoring. (default skip is " << SKIP << ", which will exclude " << endl;
+        cout << "\t" << SKIP*2 << " residues total: the three previous and three subsequent to the one involved in the contact)." << endl;
         cout << " -min\n\tMinimum (absolute) number of common residues between the two proteins around a particular contact" << endl;
         cout << "\tfor it to be accepted. (default is " << MIN << " residue[s])." << endl;
         cout << " -mat\n\tSelect the substitution matrix to be used to evaluate the score. The default matrix is " << MAT;
