@@ -48,6 +48,44 @@ or
 ./ss3d help
 ```
 
+>   SYNOPSIS
+>
+>   ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg]] [-dist <number>] [-skip <number>] [-rad <number>] [-min <number>] [-mat <matrix type>] [-dup]
+>
+>   OPTIONS:
+>
+>   Obrigatory options to specify input & output files:
+>
+>    -a
+>           Structural file in .pdb format of the first protein.
+>    -b
+>           Structural file in .pdb format of the second protein.
+>    -o
+>           Output text file in .xvg format.
+>
+>   Others options:
+>
+>    -dist
+>           The maximum distance to be considered a contact between alpha carbons, in Ångströms.
+>           (default dinstance is 10 Ångströms)
+>    -skip
+>           The minimum distance between residues in the primary structure to be considered,
+>           in absolute number (default skip is 3).
+>    -rad
+>           The maximum radius to search for interaction between alpha carbons, in Ångströms.
+>           (default radius is 10 Ångströms)
+>    -min
+>           Minimum number of common residues around the contact to be considered.
+>           (default is 1).
+>    -mat
+>           Select the substitution matrix to be used to evaluate the conscore. The default matrix is blosum62.
+>           The options are:
+>           pam250 - The PAM250 matrix.
+>           blosum62 - The BLOSUM62 matrix.
+>    -dup
+>           Duplicates the matrix in a mirrored fashion.
+
+
 _For examples and a tutorial, please refer to the [Wiki][wiki]._
 
 ## Meta

@@ -42,7 +42,7 @@ bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
     for(unsigned int i=0; i<protA.length(); i++){ //Loop through all 'A' interactions
         for(unsigned int j=0; j<protB.length(); j++){ //Loop through all 'B' interactions
 
-            //Paring ...
+            //Pairing ...
             if(protA[i].getIndexD()==protB[j].getIndexD() && protA[i].getIndexA()==protB[j].getIndexA()){
 
                 conscore=0; //Conscore value;

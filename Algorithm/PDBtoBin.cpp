@@ -27,7 +27,7 @@
 
 //Const markers
 #define ATOM "ATOM"
-#define ENDF "ENDMDL"
+#define ENDF "END"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ Structure PDBtoBin::run(string pathPDB){
             if(code!=0x00){
 
                 //Index
-                subStr=str.substr(20,6);
+                subStr=str.substr(22,4);
                 pos=subStr.find_last_of(" ");
                 subStr=subStr.substr(pos+1);
                 index = stoi(subStr);
@@ -78,7 +78,6 @@ Structure PDBtoBin::run(string pathPDB){
         //END frame
         else if(str.find(ENDF)!=string::npos){
 
-            getline(fin,str);
             break;
         }
 

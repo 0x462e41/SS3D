@@ -16,6 +16,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+/*
+    Note: This tool has been extracted from larger software. Unfortunately,
+    there are some small redundancies and small pieces of inaccessible code,
+    which would be a challenge to remove. But in my tests, the compiler
+    optimization at level 2 (-O2) fixed it and the compiled code works very
+    satisfactorily.
+*/
+
 //Constant
 #define SKIP 3 //minimum distance between residues in the primary structure to be considered
 #define RADIUS 10 //maximum radius to search for interaction between alpha carbons, in Ångströms
