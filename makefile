@@ -3,7 +3,6 @@
 # make clean_all # remove ALL objects and binary
 
 .PHONY = all install clean rmproper
-.RECIPEPREFIX = >
 
 CC:=g++
 EXE:=ss3d
@@ -15,20 +14,20 @@ LDFLAGS:=
 STD:=-std=c++14
 
 all: $(EXE)
->   @echo "DBinary is in the latest version!"
+	@echo "DBinary is in the latest version!"
 
 $(EXE) : $(OBJ)
->   @echo "DLinking Objects ... "
->   $(CC) $^ -o $(EXE) $(LDFLAGS) $(LDLIBS)
+	@echo "DLinking Objects ... "
+	$(CC) $^ -o $(EXE) $(LDFLAGS) $(LDLIBS)
 
 %.o: %.cpp
->   @echo "Compiling Source File... "
->   $(CC) $< -o $@ $(FLAG) $(STD) -c
+	@echo "Compiling Source File... "
+	$(CC) $< -o $@ $(FLAG) $(STD) -c
 
 clean:
->   @echo "Cleaning Object Files ..."
->   rm -rvf $(OBJ)
+	@echo "Cleaning Object Files ..."
+	rm -rvf $(OBJ)
 
 clean_all: clean
->   @echo "DCleaning Binary file ..."
->   rm -rvf $(EXE)
+	@echo "DCleaning Binary file ..."
+	rm -rvf $(EXE)
