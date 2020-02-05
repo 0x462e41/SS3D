@@ -39,13 +39,9 @@ Visual Studio or any c++14 IDE/Compiler.
 To get a quick overview of the required and optional parameters, type:
 
 ```sh
-./ss3d -h
-```
-
-or
-
-```sh
 ./ss3d help
+or
+./ss3d -h
 ```
 
 >   SYNOPSIS
