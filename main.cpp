@@ -81,14 +81,14 @@ int main(int argc, char **argv){
     if(args.size() >= 1)
         if(args[0]=="help" || args[0]=="-h"){
         cout << "SYNOPSIS" << endl << endl;
-        cout << "ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg]] [-dist <number>] [-rad <number>] [-skip <number>]";
-        cout << " [-min <number>] [-mat <matrix type>] [-dup]" << endl;
+        cout << "ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg/.pdb]] [-dist <number>] [-rad <number>] [-skip <number>]" << endl;
+        cout << "[-min <number>] [-mat <matrix type>] [-dup] [-norm] [-bfac]" << endl;
 
         cout << endl << "OPTIONS:" << endl << endl;
         cout << "Obligatory options to specify input & output files:" << endl << endl;
         cout << " -a\n\tStructural file in .pdb format of the first protein." << endl;
         cout << " -b\n\tStructural file in .pdb format of the second protein." << endl;
-        cout << " -o\n\tOutput text file in .xvg format." << endl;
+        cout << " -o\n\tOutput text file in .xvg or .pdb format." << endl;
         cout << endl << "Other options:" << endl << endl;
         cout << " -dist\n\tThe maximum distance to be considered a contact between two alpha carbons, in Ångströms." << endl;
         cout << "\t(default distance is " << DISTANCE << " Ångströms)" << endl;
@@ -97,21 +97,25 @@ int main(int argc, char **argv){
         cout << " -skip\n\tExclude this number of residues within the search radius upstream and downstream in primary " << endl;
         cout << "\tsequence of the alpha carbon involved in the contact. Used to diminish the contribution of " << endl;
         cout << "\tsequentially proximal residues in the scoring. (default skip is " << SKIP << ", which will exclude " << endl;
-        cout << "\t" << SKIP*2 << " residues total: the three previous and three subsequent to the one involved in the contact)." << endl;
-        cout << " -min\n\tMinimum (absolute) number of common residues between the two proteins around a particular contact" << endl;
+        cout << "\t" << SKIP*2 << " residues total: the " << SKIP << " previous and " << SKIP << " subsequent to the one ";
+        cout << "involved in the contact)." << endl;
+        cout << " -min\n\tMinimum (absolute) number of common residues between the two proteins around a particular ";
+        cout << "contact" << endl;
         cout << "\tfor it to be accepted. (default is " << MIN << " residue[s])." << endl;
         cout << " -mat\n\tSelect the substitution matrix to be used to evaluate the score. The default matrix is " << MAT;
         cout << ".\n\tThe options are:" << endl;
         cout << "\tpam250 - The PAM250 matrix." << endl;
         cout << "\tblosum62 - The BLOSUM62 matrix." << endl;
         cout << " -dup\n\tDuplicates the matrix in a mirrored fashion." << endl;
+        cout << " -norm\n\tNormalizes the result to be between 0 and 1." << endl;
+        cout << " -bfac\n\tMaps the score value to the B-factor of the first protein PDB." << endl;
 
         return 0;
     }
 
     //Checking parameter
     if(HandleInput::checkInput(args, "-h", {"-a?","-b?","-o?"},
-                {"-skip?","-dist?","-rad?","-min?","-mat?","-dup"}, 0)){
+                {"-skip?","-dist?","-rad?","-min?","-mat?","-dup","-norm","-bfac"}, 0)){
 
         //I/O Checking
         if(!HandleInput::checkIn(HandleInput::getParameter(args, "-a"), ".pdb"))
@@ -119,8 +123,6 @@ int main(int argc, char **argv){
         if(!HandleInput::checkIn(HandleInput::getParameter(args, "-b"), ".pdb"))
             kill_program();
         string outputPath=HandleInput::getParameter(args, "-o");
-        if(!HandleInput::checkOut(outputPath, ".xvg"))
-            kill_program();
 
         //First protein
 
@@ -134,11 +136,11 @@ int main(int argc, char **argv){
         //Checking optional parameter
         if(HandleInput::checkParameter(args,"-dist")) {
             if(Math::is_a_number(HandleInput::getParameter(args, "-dist"))) {
-                param_cmap.dist = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-dist"))) * 100;
+                param_cmap.dist = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-dist"))) *1000;
             } else
                 kill_program();
         }else{
-            param_cmap.dist = RADIUS*100;
+            param_cmap.dist = RADIUS*1000;
         }
 
         if(HandleInput::checkParameter(args,"-skip")) {
@@ -161,11 +163,11 @@ int main(int argc, char **argv){
         //Checking optional parameter
         if(HandleInput::checkParameter(args,"-rad")) {
             if(Math::is_a_number(HandleInput::getParameter(args, "-rad"))) {
-                param_ss3d_extract.rad = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-rad"))) * 100;
+                param_ss3d_extract.rad = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-rad"))) *1000;
             } else
                 kill_program();
         }else{
-            param_ss3d_extract.rad = RADIUS * 100;
+            param_ss3d_extract.rad = RADIUS *1000;
         }
 
         auto identity_A = ss3d::extract(frame, bonds, param_ss3d_extract);
@@ -186,11 +188,11 @@ int main(int argc, char **argv){
         //Checking optional parameter
         if(HandleInput::checkParameter(args,"-dist")) {
             if(Math::is_a_number(HandleInput::getParameter(args, "-dist"))) {
-                param_cmap.dist = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-dist"))) * 100;
+                param_cmap.dist = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-dist"))) *1000;
             } else
                 kill_program();
         }else{
-            param_cmap.dist = RADIUS*100;
+            param_cmap.dist = RADIUS*1000;
         }
 
         if(HandleInput::checkParameter(args,"-skip")) {
@@ -212,11 +214,11 @@ int main(int argc, char **argv){
         //Checking optional parameter
         if(HandleInput::checkParameter(args,"-rad")) {
             if(Math::is_a_number(HandleInput::getParameter(args, "-rad"))) {
-                param_ss3d_extract.rad = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-rad"))) * 100;
+                param_ss3d_extract.rad = static_cast<unsigned int>(stoul(HandleInput::getParameter(args,"-rad"))) *1000;
             } else
                 kill_program();
         }else{
-            param_ss3d_extract.rad = RADIUS * 100;
+            param_ss3d_extract.rad = RADIUS *1000;
         }
 
         auto identity_B = ss3d::extract(frame_b, bonds_b, param_ss3d_extract);
@@ -229,6 +231,7 @@ int main(int argc, char **argv){
 
         //Checking optional parameter
         param_ss3d_comp.dup = HandleInput::checkParameter(args,"-dup");
+        param_ss3d_comp.norm = HandleInput::checkParameter(args,"-norm");
 
         if(HandleInput::checkParameter(args,"-min")) {
             if(Math::is_a_number(HandleInput::getParameter(args, "-min"))) {
@@ -251,9 +254,20 @@ int main(int argc, char **argv){
             param_ss3d_comp.mat = MAT;
         }
 
-        param_ss3d_comp.path = outputPath;
+        bool result;
+        if(HandleInput::checkParameter(args,"-bfac")){
+            param_ss3d_comp.frame=&frame;
+            if(!HandleInput::checkOut(outputPath, ".pdb"))
+                kill_program();
+            param_ss3d_comp.path = outputPath;
+            result = ss3d::map_bfactor(identity_A, identity_B, param_ss3d_comp);
+        } else {
+            if(!HandleInput::checkOut(outputPath, ".xvg"))
+                kill_program();
+            param_ss3d_comp.path = outputPath;
+            result = ss3d::compare(identity_A, identity_B, param_ss3d_comp);
+        }
 
-        bool result = ss3d::compare(identity_A, identity_B, param_ss3d_comp);
         if(!result)
             kill_program();
 

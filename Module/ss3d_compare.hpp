@@ -22,6 +22,7 @@
 #include <iostream>
 #include "../Algorithm/ArrayList.hpp"
 #include "../Class/Interaction.hpp"
+#include "../Class/Structure.hpp"
 
 using namespace std;
 
@@ -29,10 +30,13 @@ namespace ss3d{
 
     struct Param_comp {
         bool dup;
+        bool norm;
         unsigned int min;
         string mat;
         string path;
+        Structure *frame = nullptr;
     };
 
      bool compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB, Param_comp &param);
+     bool map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB, Param_comp &param);
 };

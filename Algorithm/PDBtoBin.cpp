@@ -39,7 +39,7 @@ Structure PDBtoBin::run(string pathPDB){
     string::size_type pos;
     unsigned short int index, lastIndex=0xFFFF;
     bool header = true;
-    char code;
+    char code, type;
     AATools aaTools;
     Structure frame;
 
@@ -68,9 +68,16 @@ Structure PDBtoBin::run(string pathPDB){
                     aaTools.setMolecule(code);
                 }
 
-                //Type and position
-                frame.molecules.last().atoms.add(round(stod(str.substr(31,7))*100),round(stod(str.substr(39,7))*100),round(stod(str.substr(47,7))*100));
-                frame.molecules.last().atoms.last().atom=aaTools.atomIndex(str.substr(12,5));
+                type = aaTools.atomIndex(str.substr(12,5));
+
+                if(type != 100){
+
+                    //Type and position
+                    frame.molecules.last().atoms.add(static_cast<long>(stod(str.substr(31,7))*1000),
+                            static_cast<long>(stod(str.substr(39,7))*1000),
+                            static_cast<long>(stod(str.substr(47,7))*1000));
+                    frame.molecules.last().atoms.last().atom=type;
+                }
 
             }
         }

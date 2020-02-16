@@ -2162,7 +2162,7 @@ char AATools::atomIndex(string res){
                     return 2;
                 break;
     }
-        return '\0';
+        return 100;
 }
 
 //Returns a specific atom from a residue

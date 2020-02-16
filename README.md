@@ -46,7 +46,8 @@ or
 
 >   SYNOPSIS
 >
->   ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg]] [-dist <number>] [-skip <number>] [-rad <number>] [-min <number>] [-mat <matrix type>] [-dup]
+>   ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg/.pdb]] [-dist <number>] [-skip <number>] [-rad <number>]
+>   [-min <number>] [-mat <matrix type>] [-dup] [-norm] [-bfac]
 >
 >   OPTIONS:
 >
@@ -62,7 +63,7 @@ or
 >
 >    -o
 >
->           Output text file in .xvg format.
+>           Output text file in .xvg or .pdb format.
 >
 >   Other options:
 >
@@ -98,9 +99,38 @@ or
 >    -dup
 >
 >           Duplicates the matrix in a mirrored fashion.
+>
+>    -norm
+>
+>           Normalizes the result to be between 0 and 1.
+>
+>    -bfac
+>
+>           Maps the score value to the B-factor of the first protein PDB.
 
 
-_For examples and a tutorial, please refer to the [Wiki][wiki]._
+_For examples and a step-by-step tutorial, please refer to the [Wiki][wiki]._
+
+## Quick test the SS3D
+
+To quickly test the SS3D tool, we will assume that you have [gnuplot](http://www.gnuplot.info/)
+and [vmd](http://www.ks.uiuc.edu/Research/vmd/) previously installed on your computer.
+
+Access the "tutorial" folder and type the following into the terminal:
+
+### Generate matrix
+
+```sh
+../ss3d -a 1a5r_processed_renumbered.pdb -b 1ubq_processed_renumbered.pdb -o text-output -norm -dup
+gnuplot gen_matrix.gnu
+```
+
+### Visualize pdb with SS3D coloring:
+
+```sh
+../ss3d -a 1a5r_processed_renumbered.pdb -b 1ubq_processed_renumbered.pdb -o pdb-output -norm -bfac
+vmd -e view_bfactor.vmd
+```
 
 ## Meta
 

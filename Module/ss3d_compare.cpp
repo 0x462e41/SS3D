@@ -21,31 +21,39 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <iomanip>
+#include <algorithm>
+#include <map>
 #include "../Algorithm/ArrayList.hpp"
 #include "../Algorithm/Math.hpp"
 #include "../Class/Interaction.hpp"
 #include "../Class/Matrices.hpp"
+#include "../Algorithm/AATools.hpp"
 #include "ss3d_compare.hpp"
+
+//Define consts
+#define ATOM "ATOM"
+#define ENDF "END"
+
 
 using namespace std;
 
-bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB, Param_comp &param) {
-
+//Calculates the score using the chosen matrix
+void getScore(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
+        ss3d::Param_comp &param, vector<unsigned short int> &resA, vector<unsigned short int> &resB,
+        vector<float> &score){
 
     //Variable
-    ofstream fout(param.path);
-    float score;
+    float tmp_f;
     unsigned int cnt;
 
-    //Calculates the score using the chosen matrix, and saves it into the file
-    fout << "#IndexA IndexB Score\n";
     for(unsigned int i=0; i<protA.length(); i++){ //Loop through all 'A' interactions
         for(unsigned int j=0; j<protB.length(); j++){ //Loop through all 'B' interactions
 
             //Pairing ...
             if(protA[i].getIndexD()==protB[j].getIndexD() && protA[i].getIndexA()==protB[j].getIndexA()){
 
-                score=0; //Conscore value;
+                tmp_f=0; //score value;
                 cnt=0; //Number of common residues around the contact
 
                 //Lining up the interactions, and calculating the score
@@ -53,14 +61,19 @@ bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
                     for(unsigned int l=0; l<protB[j].molecules.length(); l++) //Loop through all residues around B
                         if(protA[i].molecules[k].getIndex()==protB[j].molecules[l].getIndex()){
                             cnt++;
-                            score+=Matrix::align(param.mat, protA[i].molecules[k], protB[j].molecules[l]);
+                            tmp_f+=Matrix::align(param.mat, protA[i].molecules[k], protB[j].molecules[l]);
                         }
 
                 //Checking if the minimum number of common residues around this contact was attended
                 if(cnt>=param.min){
-                    fout << protA[i].getIndexD() << " " << protA[i].getIndexA() << " " << score << " " << "\n";
-                    if(param.dup)
-                        fout << protA[i].getIndexA() << " " << protA[i].getIndexD() << " " << score << " " << "\n";
+                    resA.push_back(protA[i].getIndexD());
+                    resB.push_back(protA[i].getIndexA());
+                    score.push_back(tmp_f);
+                    if(param.dup) {
+                        resA.push_back(protA[i].getIndexA());
+                        resB.push_back(protA[i].getIndexD());
+                        score.push_back(tmp_f);
+                    }
                 }
 
                 break;
@@ -68,10 +81,135 @@ bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
             }
         }
     }
+}
+
+//Generating a matrix output
+bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB, Param_comp &param) {
+
+    //Variable
+    ofstream fout(param.path);
+    vector<unsigned short int> resA, resB;
+    vector<float> score;
+
+
+    //Calculates the score using the chosen matrix
+    getScore(protA, protB, param, resA, resB, score);
+
+    //Outputting result
+    fout << "#IndexA IndexB Score\n";
+    if(param.norm) {
+        auto max = *max_element(score.begin(), score.end());
+        for(int i=0; i < score.size(); i++) {
+            fout << resA[i] << " " << resB[i] << " " << score[i]/max << "\n";
+        }
+    } else {
+        for(int i=0; i < score.size(); i++) {
+            fout << resA[i] << " " << resB[i] << " " << score[i] << "\n";
+        }
+    }
 
     fout.close();
     cout << endl << "Done!" << endl;
 
+
+    return true;
+}
+
+//Mapping to bfactor
+bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB, Param_comp &param) {
+
+    //Variable
+    ofstream fout(param.path);
+    fout << setprecision(3);
+    fout << fixed;
+    vector<unsigned short int> resA, resB;
+    vector<float> score;
+    unsigned int nAtom = 1;
+    unsigned short int lastIndex = 0xFFFF;
+    AATools aaTools;
+    map<unsigned short int, float> resid_score;
+    map<unsigned short int, unsigned int> resid_cnt;
+    pair<map<unsigned short int, float>::iterator,bool> ret;
+
+    //Calculates the score using the chosen matrix
+    param.dup=false;
+    getScore(protA, protB, param, resA, resB, score);
+
+    //Mapping sum
+    for(unsigned int i = 0; i < score.size(); i++){
+        ret = resid_score.insert(pair<unsigned short int, float>(resA[i],score[i]));
+        if(!ret.second) {
+            ret.first->second+=score[i];
+            resid_cnt[resA[i]]+=1;
+        } else {
+            resid_cnt[resA[i]]=1;
+        }
+
+        ret = resid_score.insert(pair<unsigned short int, float>(resB[i],score[i]));
+        if(!ret.second) {
+            ret.first->second+=score[i];
+            resid_cnt[resB[i]]+=1;
+        } else {
+            resid_cnt[resB[i]]=1;
+        }
+    }
+
+    //Average
+    for (auto &x : resid_score) {
+        x.second/=resid_cnt[x.first];
+    }
+
+    //Normalizes the result (if param exists)
+    if(param.norm) {
+        auto max_e = max_element(resid_score.begin(), resid_score.end(),
+                   [](const pair<unsigned short int, float> &p1,
+                   const pair<unsigned short int, float> &p2) {
+                       return p1.second < p2.second;
+                   }
+        );
+
+        auto max = max_e->second;
+        for (auto &x : resid_score) {
+            x.second/=max;
+        }
+    }
+
+    //Outputting result
+
+    //Printing header
+    fout << "REMARK    GENERATED BY SS3D" << "\n";
+
+    //Printing molecules
+    param.frame->molecules.runLambda([&fout,&nAtom,&lastIndex,&aaTools,&resid_score](auto &mol){
+
+    if(mol.getIndex()!=lastIndex){
+        lastIndex=mol.getIndex();
+        aaTools.setMolecule(mol.getType());
+    }
+    mol.atoms.runLambda([&mol,&fout,&nAtom,&aaTools,&resid_score](auto &at){
+
+        if(resid_score.find(mol.getIndex()) != resid_score.end()) {
+            fout << ATOM;
+            fout << setw(7) << setfill(' ') << nAtom++;
+            fout << " ";
+            fout << aaTools.getAtom(at.atom);
+            fout << AATools::convertCode(mol.getType());
+            fout << setw(6) << setfill(' ') << mol.getIndex();
+            fout << "     ";
+            fout << setw(7) << setfill(' ') << at.x/1000.f << " ";
+            fout << setw(7) << setfill(' ') << at.y/1000.f << " ";
+            fout << setw(7) << setfill(' ') << at.z/1000.f << "  1.00 ";
+            fout << resid_score[mol.getIndex()] << "\n";
+        }
+    });
+    });
+
+    //Printing footnote
+    fout << "TER" << "\n";
+    fout << ENDF << "\n";
+
+    fout.close();
+    cout << endl << "Done!" << endl;
 
     return true;
 }

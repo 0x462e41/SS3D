@@ -24,7 +24,7 @@ using namespace std;
 
 struct Atom{
 
-    int x=0, y=0, z=0;
+    long int x=0, y=0, z=0;
     char atom;
 
     Atom(){}
