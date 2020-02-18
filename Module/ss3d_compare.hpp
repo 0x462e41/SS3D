@@ -31,6 +31,7 @@ namespace ss3d{
     struct Param_comp {
         bool dup;
         bool norm;
+        bool raw;
         unsigned int min;
         string mat;
         string path;

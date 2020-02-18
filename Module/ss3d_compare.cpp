@@ -41,11 +41,13 @@ using namespace std;
 //Calculates the score using the chosen matrix
 void getScore(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
         ss3d::Param_comp &param, vector<unsigned short int> &resA, vector<unsigned short int> &resB,
-        vector<float> &score){
+        vector<int> &score, bool flag, ofstream &fout){
 
     //Variable
-    float tmp_f;
+    int tmp_s, tmp_sum;
     unsigned int cnt;
+    vector<char> itA, itB;
+    vector<int> scs;
 
     for(unsigned int i=0; i<protA.length(); i++){ //Loop through all 'A' interactions
         for(unsigned int j=0; j<protB.length(); j++){ //Loop through all 'B' interactions
@@ -53,27 +55,61 @@ void getScore(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
             //Pairing ...
             if(protA[i].getIndexD()==protB[j].getIndexD() && protA[i].getIndexA()==protB[j].getIndexA()){
 
-                tmp_f=0; //score value;
+                tmp_sum=0; //score value;
                 cnt=0; //Number of common residues around the contact
+
+                //If raw flag is set, print raw informations about
+                if(flag) {
+                    fout << protA[i].getIndexD() << " " << protA[i].getIndexA() << "\n";
+                    itA.clear();
+                    itB.clear();
+                    scs.clear();
+                }
 
                 //Lining up the interactions, and calculating the score
                 for(unsigned int k=0; k<protA[i].molecules.length(); k++) //Loop through all residues around A
                     for(unsigned int l=0; l<protB[j].molecules.length(); l++) //Loop through all residues around B
                         if(protA[i].molecules[k].getIndex()==protB[j].molecules[l].getIndex()){
                             cnt++;
-                            tmp_f+=Matrix::align(param.mat, protA[i].molecules[k], protB[j].molecules[l]);
+                            tmp_s=Matrix::align(param.mat, protA[i].molecules[k], protB[j].molecules[l]);
+                            tmp_sum+=tmp_s;
+                            if(flag) {
+                                itA.push_back(protA[i].molecules[k].getType());
+                                itB.push_back(protB[j].molecules[l].getType());
+                                scs.push_back(tmp_s);
+                            }
                         }
 
                 //Checking if the minimum number of common residues around this contact was attended
                 if(cnt>=param.min){
                     resA.push_back(protA[i].getIndexD());
                     resB.push_back(protA[i].getIndexA());
-                    score.push_back(tmp_f);
+                    score.push_back(tmp_sum);
                     if(param.dup) {
                         resA.push_back(protA[i].getIndexA());
                         resB.push_back(protA[i].getIndexD());
-                        score.push_back(tmp_f);
+                        score.push_back(tmp_sum);
                     }
+                }
+
+                if(flag){
+                    for(auto const &x : itA) {
+                        fout << x;
+                    }
+                    fout << "\n";
+                    for(auto const &x : itB) {
+                        fout << x;
+                    }
+                    fout << "\n|";
+                    for(auto const &x : scs) {
+                        fout << x << "|";
+                    }
+                    fout << "\n";
+                    if(cnt>=param.min)
+                        fout << "Sum: " << score.back() << "\n";
+                    else
+                        fout << "Sum: skipped" << "\n";
+                    fout << "===============\n";
                 }
 
                 break;
@@ -89,22 +125,24 @@ bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
     //Variable
     ofstream fout(param.path);
     vector<unsigned short int> resA, resB;
-    vector<float> score;
+    vector<int> score;
 
 
     //Calculates the score using the chosen matrix
-    getScore(protA, protB, param, resA, resB, score);
+    getScore(protA, protB, param, resA, resB, score, param.raw, fout);
 
     //Outputting result
-    fout << "#IndexA IndexB Score\n";
-    if(param.norm) {
-        auto max = *max_element(score.begin(), score.end());
-        for(int i=0; i < score.size(); i++) {
-            fout << resA[i] << " " << resB[i] << " " << score[i]/max << "\n";
-        }
-    } else {
-        for(int i=0; i < score.size(); i++) {
-            fout << resA[i] << " " << resB[i] << " " << score[i] << "\n";
+    if(!param.raw){
+        fout << "#IndexA IndexB Score\n";
+        if(param.norm) {
+            auto max = *max_element(score.begin(), score.end());
+            for(int i=0; i < score.size(); i++) {
+                fout << resA[i] << " " << resB[i] << " " << score[i]/max << "\n";
+            }
+        } else {
+            for(int i=0; i < score.size(); i++) {
+                fout << resA[i] << " " << resB[i] << " " << score[i] << "\n";
+            }
         }
     }
 
@@ -123,21 +161,21 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
     fout << setprecision(3);
     fout << fixed;
     vector<unsigned short int> resA, resB;
-    vector<float> score;
+    vector<int> score;
     unsigned int nAtom = 1;
     unsigned short int lastIndex = 0xFFFF;
     AATools aaTools;
-    map<unsigned short int, float> resid_score;
+    map<unsigned short int, int> resid_score;
     map<unsigned short int, unsigned int> resid_cnt;
-    pair<map<unsigned short int, float>::iterator,bool> ret;
+    pair<map<unsigned short int, int>::iterator,bool> ret;
 
     //Calculates the score using the chosen matrix
     param.dup=false;
-    getScore(protA, protB, param, resA, resB, score);
+    getScore(protA, protB, param, resA, resB, score, param.raw, fout);
 
     //Mapping sum
     for(unsigned int i = 0; i < score.size(); i++){
-        ret = resid_score.insert(pair<unsigned short int, float>(resA[i],score[i]));
+        ret = resid_score.insert(pair<unsigned short int, int>(resA[i],score[i]));
         if(!ret.second) {
             ret.first->second+=score[i];
             resid_cnt[resA[i]]+=1;
@@ -145,7 +183,7 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
             resid_cnt[resA[i]]=1;
         }
 
-        ret = resid_score.insert(pair<unsigned short int, float>(resB[i],score[i]));
+        ret = resid_score.insert(pair<unsigned short int, int>(resB[i],score[i]));
         if(!ret.second) {
             ret.first->second+=score[i];
             resid_cnt[resB[i]]+=1;
@@ -162,8 +200,8 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
     //Normalizes the result (if param exists)
     if(param.norm) {
         auto max_e = max_element(resid_score.begin(), resid_score.end(),
-                   [](const pair<unsigned short int, float> &p1,
-                   const pair<unsigned short int, float> &p2) {
+                   [](const pair<unsigned short int, int> &p1,
+                   const pair<unsigned short int, int> &p2) {
                        return p1.second < p2.second;
                    }
         );

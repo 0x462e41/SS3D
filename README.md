@@ -47,7 +47,7 @@ or
 >   SYNOPSIS
 >
 >   ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg/.pdb]] [-dist <number>] [-skip <number>] [-rad <number>]
->   [-min <number>] [-mat <matrix type>] [-dup] [-norm] [-bfac]
+>   [-min <number>] [-mat <matrix type>] [-dup] [-norm] [-bfac] [-raw]
 >
 >   OPTIONS:
 >
@@ -107,6 +107,11 @@ or
 >    -bfac
 >
 >           Maps the score value to the B-factor of the first protein PDB.
+>
+>    -raw
+>
+>           Produces a raw text file containing the local alignment for each contact, ignoring the
+>           parameters ``-bfac``, ``-dup`` and ``-norm``, if present.
 
 
 _For examples and a step-by-step tutorial, please refer to the [Wiki][wiki]._

@@ -29,7 +29,7 @@ namespace Matrix{
 
 
     //Matrix PAM 250
-    const static float pam250[20][20]=
+    const static int pam250[20][20]=
     {
     {2,-2,0,0,-2,0,0,1,-1,-1,-2,-1,-1,-4,1,1,1,-6,-3,0}, //A
     {-2,6,0,-1,-4,1,-1,-3,2,-2,-3,3,0,-4,0,0,-1,2,-4,-2}, //R
@@ -54,7 +54,7 @@ namespace Matrix{
     };
 
     //Matrix BLOSUM62
-    const static float blosum62[20][20]=
+    const static int blosum62[20][20]=
     {
     {4,-1,-2,-2,0,-1,-1,0,-2,-1,-1,-1,-1,-2,-1,1,0,-3,-2,0}, //A
     {-1,5,0,-2,-3,1,0,-2,0,-3,-2,2,-1,-3,-2,-1,-1,-3,-2,-3}, //R
@@ -78,6 +78,6 @@ namespace Matrix{
     {0,-3,-3,-3,-1,-2,-2,-3,-3,3,1,-2,1,-1,-2,-2,0,-3,-1,4}, //V
     };
 
-    float align(string &mat, Molecule &molA, Molecule &molB);
+    int align(string &mat, Molecule &molA, Molecule &molB);
 
 };

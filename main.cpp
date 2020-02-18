@@ -82,7 +82,7 @@ int main(int argc, char **argv){
         if(args[0]=="help" || args[0]=="-h"){
         cout << "SYNOPSIS" << endl << endl;
         cout << "ss3d [-a [.pdb]] [-b [.pdb]] [-o [.xvg/.pdb]] [-dist <number>] [-rad <number>] [-skip <number>]" << endl;
-        cout << "[-min <number>] [-mat <matrix type>] [-dup] [-norm] [-bfac]" << endl;
+        cout << "[-min <number>] [-mat <matrix type>] [-dup] [-norm] [-bfac] [-raw]" << endl;
 
         cout << endl << "OPTIONS:" << endl << endl;
         cout << "Obligatory options to specify input & output files:" << endl << endl;
@@ -109,13 +109,15 @@ int main(int argc, char **argv){
         cout << " -dup\n\tDuplicates the matrix in a mirrored fashion." << endl;
         cout << " -norm\n\tNormalizes the result to be between 0 and 1." << endl;
         cout << " -bfac\n\tMaps the score value to the B-factor of the first protein PDB." << endl;
+        cout << " -raw\n\tProduces a raw text file containing the local alignment for each contact, ignoring the" << endl;
+        cout << "\tparameters \"-bfac\", \"-dup\" and \"-norm\", if present." << endl;
 
         return 0;
     }
 
     //Checking parameter
     if(HandleInput::checkInput(args, "-h", {"-a?","-b?","-o?"},
-                {"-skip?","-dist?","-rad?","-min?","-mat?","-dup","-norm","-bfac"}, 0)){
+                {"-skip?","-dist?","-rad?","-min?","-mat?","-dup","-norm","-bfac", "-raw"}, 0)){
 
         //I/O Checking
         if(!HandleInput::checkIn(HandleInput::getParameter(args, "-a"), ".pdb"))
@@ -232,6 +234,7 @@ int main(int argc, char **argv){
         //Checking optional parameter
         param_ss3d_comp.dup = HandleInput::checkParameter(args,"-dup");
         param_ss3d_comp.norm = HandleInput::checkParameter(args,"-norm");
+        param_ss3d_comp.raw = HandleInput::checkParameter(args,"-raw");
 
         if(HandleInput::checkParameter(args,"-min")) {
             if(Math::is_a_number(HandleInput::getParameter(args, "-min"))) {
@@ -255,14 +258,19 @@ int main(int argc, char **argv){
         }
 
         bool result;
-        if(HandleInput::checkParameter(args,"-bfac")){
+        if(HandleInput::checkParameter(args,"-bfac") && !param_ss3d_comp.raw){
             param_ss3d_comp.frame=&frame;
             if(!HandleInput::checkOut(outputPath, ".pdb"))
                 kill_program();
             param_ss3d_comp.path = outputPath;
             result = ss3d::map_bfactor(identity_A, identity_B, param_ss3d_comp);
-        } else {
+        } else if(!param_ss3d_comp.raw){
             if(!HandleInput::checkOut(outputPath, ".xvg"))
+                kill_program();
+            param_ss3d_comp.path = outputPath;
+            result = ss3d::compare(identity_A, identity_B, param_ss3d_comp);
+        } else {
+            if(!HandleInput::checkOut(outputPath, ".txt"))
                 kill_program();
             param_ss3d_comp.path = outputPath;
             result = ss3d::compare(identity_A, identity_B, param_ss3d_comp);

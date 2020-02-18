@@ -24,7 +24,7 @@
 
 using namespace std;
 
-float Matrix::align(string &mat, Molecule &molA, Molecule &molB){
+int Matrix::align(string &mat, Molecule &molA, Molecule &molB){
 
     unsigned short int x, y;
     char type1 = molA.getType(), type2 = molB.getType();
