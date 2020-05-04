@@ -137,7 +137,7 @@ bool ss3d::compare(ArrayList<Interaction> &protA, ArrayList<Interaction> &protB,
         if(param.norm) {
             auto max = *max_element(score.begin(), score.end());
             for(int i=0; i < score.size(); i++) {
-                fout << resA[i] << " " << resB[i] << " " << score[i]/max << "\n";
+                fout << resA[i] << " " << resB[i] << " " << static_cast<float>(score[i])/static_cast<float>(max) << "\n";
             }
         } else {
             for(int i=0; i < score.size(); i++) {
@@ -165,9 +165,9 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
     unsigned int nAtom = 1;
     unsigned short int lastIndex = 0xFFFF;
     AATools aaTools;
-    map<unsigned short int, int> resid_score;
+    map<unsigned short int, float> resid_score;
     map<unsigned short int, unsigned int> resid_cnt;
-    pair<map<unsigned short int, int>::iterator,bool> ret;
+    pair<map<unsigned short int, float>::iterator,bool> ret;
 
     //Calculates the score using the chosen matrix
     param.dup=false;
@@ -175,7 +175,7 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
 
     //Mapping sum
     for(unsigned int i = 0; i < score.size(); i++){
-        ret = resid_score.insert(pair<unsigned short int, int>(resA[i],score[i]));
+        ret = resid_score.insert(pair<unsigned short int, float>(resA[i],static_cast<float>(score[i])));
         if(!ret.second) {
             ret.first->second+=score[i];
             resid_cnt[resA[i]]+=1;
@@ -183,7 +183,7 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
             resid_cnt[resA[i]]=1;
         }
 
-        ret = resid_score.insert(pair<unsigned short int, int>(resB[i],score[i]));
+        ret = resid_score.insert(pair<unsigned short int, float>(resB[i],static_cast<float>(score[i])));
         if(!ret.second) {
             ret.first->second+=score[i];
             resid_cnt[resB[i]]+=1;
@@ -194,14 +194,14 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
 
     //Average
     for (auto &x : resid_score) {
-        x.second/=resid_cnt[x.first];
+        x.second/=static_cast<float>(resid_cnt[x.first]);
     }
 
     //Normalizes the result (if param exists)
     if(param.norm) {
         auto max_e = max_element(resid_score.begin(), resid_score.end(),
-                   [](const pair<unsigned short int, int> &p1,
-                   const pair<unsigned short int, int> &p2) {
+                   [](const pair<unsigned short int, float> &p1,
+                   const pair<unsigned short int, float> &p2) {
                        return p1.second < p2.second;
                    }
         );
