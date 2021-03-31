@@ -6,7 +6,7 @@ evaluating the Sequence Similarity in 3D space between two proteins. Such compar
 are useful for a plethora of purposes such as determination of conserved positions,
 and explaining different functionalities of proteins that evolved from a common ancestor.
 
-For more information about this tool, check the paper at ~~upcoming link~~.
+For more information about this tool, check the paper [here](https://doi.org/10.1016/j.jmgm.2021.107906).
 
 ## Installation
 
