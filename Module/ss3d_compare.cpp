@@ -206,9 +206,17 @@ bool ss3d::map_bfactor(ArrayList<Interaction> &protA, ArrayList<Interaction> &pr
                    }
         );
 
+        auto min_e = min_element(resid_score.begin(), resid_score.end(),
+                   [](const pair<unsigned short int, float> &p1,
+                   const pair<unsigned short int, float> &p2) {
+                       return p1.second < p2.second;
+                   }
+        );
+
         auto max = max_e->second;
+	auto min = min_e->second;
         for (auto &x : resid_score) {
-            x.second/=max;
+	    x.second=(x.second-min)/(max-min);
         }
     }
 
